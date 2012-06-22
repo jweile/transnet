@@ -95,7 +95,7 @@ public final class Main {
      */
     private void run(String user, String pwd) {
         
-        File outFile = new File("out.owl.gz");
+        File outFile = new File("tdb_out");
         
         Pipeline pipeline = new Pipeline();
         pipeline.addNode(new DBReader(user,pwd));

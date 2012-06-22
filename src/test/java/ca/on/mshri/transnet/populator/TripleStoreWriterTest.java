@@ -4,6 +4,11 @@
  */
 package ca.on.mshri.transnet.populator;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.tdb.TDBFactory;
 import de.jweile.yogiutil.pipeline.Pipeline;
 import de.jweile.yogiutil.pipeline.StartNode;
 import java.io.File;
@@ -18,7 +23,7 @@ import junit.framework.TestCase;
 public class TripleStoreWriterTest extends TestCase {
     
     public void test() {
-        File outFile = new File(new File("target"),"test.owl");
+        File outFile = new File(new File("target"),"tdb.out");
         
         
         Pipeline p = new Pipeline();
@@ -41,6 +46,16 @@ public class TripleStoreWriterTest extends TestCase {
         p.start();
         
         assertTrue(outFile.exists());
+        
+        
+        Dataset tdbSet = TDBFactory.createDataset(outFile.getAbsolutePath());
+                
+        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbSet.getDefaultModel());
+        
+        assertNotNull("Triplestore contents sample not found!",model.getIndividual(TripleStoreWriter.PRE+"entrezgene"));
+        
+        model.close();
+        tdbSet.close();
     }
     
 //    public File toFile(String[] path) {

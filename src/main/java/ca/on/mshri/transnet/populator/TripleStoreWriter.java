@@ -10,18 +10,13 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.tdb.TDBFactory;
 import de.jweile.yogiutil.pipeline.EndNode;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
 
 /**
  *
@@ -32,6 +27,7 @@ final class TripleStoreWriter extends EndNode<Entry> {
     private File outFile;
     
     private OntModel model;
+    private Dataset tdbSet;
     
     private OntClass objectClass;
     private OntClass xrefClass;
@@ -53,9 +49,12 @@ final class TripleStoreWriter extends EndNode<Entry> {
     @Override
     protected void before() {
         
+        tdbSet = TDBFactory.createDataset(outFile.getAbsolutePath());
+        
         InputStream in = Main.class.getClassLoader().getResourceAsStream("sbns.owl");
         
-        model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
+        model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbSet.getDefaultModel());
+        
         model.read(in,null);
                 
         objectClass = model.getOntClass(PRE+"Object");
@@ -100,27 +99,31 @@ final class TripleStoreWriter extends EndNode<Entry> {
     @Override
     protected void after() {
         
-        Logger.getLogger(TripleStoreWriter.class.getName())
-                .info("Writing RDF file...");
+        model.commit();
+        model.close();
+        tdbSet.close();
         
-        OutputStream out = null;
-        try {
-            out = new GZIPOutputStream(new FileOutputStream(outFile));
-            model.write(out, "RDF/XML", null);
-            model.close();
-            
-            Logger.getLogger(TripleStoreWriter.class.getName())
-                    .info("done.");
-        } catch (IOException ex) {
-            throw new RuntimeException("Unable to write to file "+outFile.getName(), ex);
-        } finally {
-            try {
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(TripleStoreWriter.class.getName())
-                        .log(Level.WARNING, "Failed to close output stream", ex);
-            }
-        }
+//        Logger.getLogger(TripleStoreWriter.class.getName())
+//                .info("Writing RDF file...");
+//        
+//        OutputStream out = null;
+//        try {
+//            out = new GZIPOutputStream(new FileOutputStream(outFile));
+//            model.write(out, "RDF/XML", null);
+//            model.close();
+//            
+//            Logger.getLogger(TripleStoreWriter.class.getName())
+//                    .info("done.");
+//        } catch (IOException ex) {
+//            throw new RuntimeException("Unable to write to file "+outFile.getName(), ex);
+//        } finally {
+//            try {
+//                out.close();
+//            } catch (IOException ex) {
+//                Logger.getLogger(TripleStoreWriter.class.getName())
+//                        .log(Level.WARNING, "Failed to close output stream", ex);
+//            }
+//        }
     }
     
     
