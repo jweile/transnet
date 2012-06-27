@@ -112,12 +112,12 @@ final class DBReader extends StartNode<Entry> {
             
             s = db.createStatement();
             r = s.executeQuery(
-                    "SELECT syn_id, source_id, ns_id FROM synonym WHERE gene_id='"+
+                    "SELECT id, source_id, ns_id FROM synonym WHERE gene_id='"+
                     currGeneId+"';"
                     );
             
             while (r.next()) {
-                e.addSynonym(new Entry.Synonym(r.getString("syn_id"), 
+                e.addSynonym(new Entry.Synonym(r.getString("id"), 
                         r.getInt("source_id"), 
                         r.getInt("ns_id")
                         ));
