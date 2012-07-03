@@ -1,0 +1,13 @@
+PREFIX sbns: <http://llama.mshri.on.ca/sbns.owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?synonym ?namespace
+WHERE
+{
+	?xref sbns:hasValue "%s"^^xsd:string .
+	?gene sbns:hasXRef ?xref .
+	?gene sbns:hasXRef ?otherxref .
+	?otherxref sbns:hasNamespace ?namespace .
+	?otherxref sbns:hasValue ?synonym .
+}

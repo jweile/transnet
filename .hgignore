@@ -9,4 +9,5 @@ nbactions.xml
 \.log(\.\d)*$
 \.db$
 \.bak$
+\.sublime.*$
 
