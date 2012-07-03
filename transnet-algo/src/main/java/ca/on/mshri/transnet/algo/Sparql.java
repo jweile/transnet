@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2011 The Roth Lab
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package ca.on.mshri.transnet.algo;
 
@@ -12,32 +24,43 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- *
- * @author jweile
+ * This class indexes SPARQL queries from the resources folder.
+ * 
+ * @author Jochen Weile <jochenweile@gmail.com>
  */
 public class Sparql {
     
+    /**
+     * map for indexing queries.
+     */
     private Map<String,String> queries = new HashMap<String,String>();
     
+    /**
+     * singleton
+     */
     private static Sparql instance;
 
+    /**
+     * singleton constructor.
+     */
     private Sparql() {
         read();
     }
 
+    /**
+     * @return 
+     * singleton
+     */
     public static Sparql getInstance() {
         if (instance == null) {
             instance = new Sparql();
@@ -45,6 +68,9 @@ public class Sparql {
         return instance;
     }
 
+    /**
+     * performs the indexing from the resources directory.
+     */
     private void read() {
         
         CodeSource src = Sparql.class.getProtectionDomain().getCodeSource();
@@ -103,6 +129,15 @@ public class Sparql {
         } 
     }
     
+    /**
+     * Get the query for the given key
+     * 
+     * @param key 
+     * the query key corresponds to the SPARQL file name
+     * 
+     * @return 
+     * the query object
+     */
     public Query get(String key) {
         
         String qString = queries.get(key);
@@ -114,6 +149,18 @@ public class Sparql {
         }
     }
     
+    /**
+     * Get the query for the given key with the give parameters
+     * 
+     * @param key
+     * the query key corresponds to the SPARQL file name
+     * 
+     * @param values 
+     * Strings to replace %s tags in the query string before instantiating the query.
+     * 
+     * @return 
+     * the query object.
+     */
     public Query get(String key, String... values) {
         
         String qString = queries.get(key);

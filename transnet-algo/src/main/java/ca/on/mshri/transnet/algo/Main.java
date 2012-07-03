@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2011 The Roth Lab
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package ca.on.mshri.transnet.algo;
 
@@ -18,11 +30,16 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- *
- * @author jweile
+ * This module performs algorithmic operations on the transnet triplestore.
+ * 
+ * @author Jochen Weile <jochenweile@gmail.com>
  */
 public class Main {
     
+    /**
+     * Main method.
+     * @param args the command line arguments.
+     */
     public static void main(String[] args) {
         try {
             
@@ -39,6 +56,10 @@ public class Main {
         }
     }
 
+    /**
+     * compiles an error message and logs it.
+     * @param t 
+     */
     private static void processError(Throwable t) {
         
         StringBuilder b = new StringBuilder(256);
@@ -52,6 +73,10 @@ public class Main {
         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, b.toString(), t);
     }
 
+    /**
+     * Enables simple command line output for and extensive logging to file.
+     * @throws IOException If the log file cannot be written.
+     */
     private static void setupLogging() throws IOException {
         
         //setup CLI output
@@ -88,16 +113,20 @@ public class Main {
         Logger.getLogger("").addHandler(fh);
     }
 
+    /**
+     * print usage and exit
+     */
     private static void usageAndDie() {
         System.err.println("Usage: java -jar transnet-algo.jar <dbFile> <species>");
         System.exit(1);
     }
 
     /**
-     * 
+     * run the main program.
      */
     private void run(String dbPos, String species) {
         
+        //check database
         File dbFile = new File(dbPos);
         if (!dbFile.exists() && dbFile.canRead()) {
             throw new RuntimeException("DB directory does not exist or cannot be read!");
@@ -105,19 +134,24 @@ public class Main {
         
         IO io = IO.getInstance();
         
+        //try to connect to database
         Dataset tdbSet = null;
         try {
             
             tdbSet = TDBFactory.createDataset(dbFile.getAbsolutePath());
+            //create algo object
             Algo algo = new Algo(tdbSet.getDefaultModel());
             
-            String out = algo.xrefStats(species);
+            //analyze xref frequencies
+            String out = algo.analyzeXRefFrequencies(species);
             io.write("xref_freqs.csv", out);
             
-            out = algo.xrefClusters(species);
+            //analyze xref clustering
+            out = algo.analyzeXRefClusters(species);
             io.write("xref_clusters.csv",out);
             
-            out = algo.xrefAmbiguity(species);
+            //find xref redundancies.
+            out = algo.findXRefRedundancies(species);
             io.write("xref_ambiguous.txt", out);
             
         } finally {
