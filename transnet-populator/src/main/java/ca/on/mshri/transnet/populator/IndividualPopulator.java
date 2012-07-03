@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2011 The Roth Lab
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package ca.on.mshri.transnet.populator;
 
@@ -21,19 +33,45 @@ import java.util.logging.Logger;
 import static ca.on.mshri.transnet.populator.TripleStoreWriter.SBNS;
 
 /**
- *
- * @author jweile
+ * Populates triplestore with individuals of a certain type according to the 
+ * contents of a given file.
+ * @author Jochen Weile <jochenweile@gmail.com>
  */
 class IndividualPopulator {
 
+    /**
+     * The class to which the individuals will belong.
+     */
     private OntClass clazz;
+    
+    /**
+     * The ontology model from the triplestore.
+     */
     private OntModel model;
     
+    /**
+     * Constructor.
+     * 
+     * @param model
+     * The ontology model from the triplestore.
+     * 
+     * @param clazz 
+     * The class to which the individuals will belong.
+     */
     public IndividualPopulator(OntModel model, OntClass clazz) {
         this.clazz = clazz;
         this.model = model;
     }
 
+    /**
+     * Populates the ontology model with individuals from the given file
+     * 
+     * @param file 
+     * a tab-delim file containing the individual ids and names
+     * 
+     * @return 
+     * a map with the individuals by ID.
+     */
     Map<Integer, Individual> run(String file) {
         
         Map<Integer,Individual> map = new HashMap<Integer, Individual>();

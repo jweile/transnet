@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2011 The Roth Lab
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package ca.on.mshri.transnet.populator;
 
@@ -17,11 +29,17 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- *
- * @author jweile
+ * Reads from the synergizer database and writes to a Jena TDB triplestore.
+ * Uses a parallelized pipeline configuration.
+ * 
+ * @author Jochen Weile <jochenweile@gmail.com>
  */
 public final class Main {
     
+    /**
+     * Main method.
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         try {
             
@@ -38,6 +56,10 @@ public final class Main {
         }
     }
 
+    /**
+     * compile error message and log it.
+     * @param t the error
+     */
     private static void processError(Throwable t) {
         StringBuilder b = new StringBuilder(256);
 
@@ -50,6 +72,10 @@ public final class Main {
         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, b.toString(), t);
     }
 
+    /**
+     * simple CLI output + detailed log file.
+     * @throws IOException if log file cannot be written.
+     */
     private static void setupLogging() throws IOException {
         //setup CLI output
         for (Handler h : Logger.getLogger("").getHandlers()) {
@@ -85,13 +111,16 @@ public final class Main {
         Logger.getLogger("").addHandler(fh);
     }
 
+    /**
+     * print usage and exit
+     */
     private static void usageAndDie() {
         System.err.println("Usage: java -jar transnet-populator.jar <username> <password>");
         System.exit(1);
     }
 
     /**
-     * 
+     * sets up the pipeline and runs it.
      */
     private void run(String user, String pwd) {
         
