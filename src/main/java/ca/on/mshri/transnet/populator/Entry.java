@@ -48,6 +48,11 @@ final class Entry {
     public void setSpeciesId(int speciesId) {
         this.speciesId = speciesId;
     }
+    
+    
+    public int getSourceId() {
+        return sourceId;
+    }
 
     public List<Synonym> getSynonyms() {
         if (synonyms == null) {

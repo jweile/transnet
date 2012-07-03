@@ -22,10 +22,10 @@ import junit.framework.TestCase;
  */
 public class TripleStoreWriterTest extends TestCase {
     
+    public static final File OUT_FILE = new File(new File("target"),"tdb.out");
+    
     public void test() {
-        File outFile = new File(new File("target"),"tdb.out");
-        
-        
+                
         Pipeline p = new Pipeline();
         p.addNode(new StartNode<Entry>("Mock start") {
 
@@ -41,22 +41,33 @@ public class TripleStoreWriterTest extends TestCase {
             }
         });
                 
-        p.addNode(new TripleStoreWriter(outFile));
+        p.addNode(new TripleStoreWriter(OUT_FILE));
         
         p.start();
         
-        assertTrue(outFile.exists());
+        assertTrue(OUT_FILE.exists());
         
         
-        Dataset tdbSet = TDBFactory.createDataset(outFile.getAbsolutePath());
-                
-        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbSet.getDefaultModel());
+        Dataset tdbSet = null;
+        OntModel model = null;
+        try {
+            tdbSet = TDBFactory.createDataset(OUT_FILE.getAbsolutePath());
+
+            model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbSet.getDefaultModel());
+
+            assertNotNull("Triplestore contents sample not found!",model.getIndividual(TripleStoreWriter.SBNS+"entrezgene"));
         
-        assertNotNull("Triplestore contents sample not found!",model.getIndividual(TripleStoreWriter.PRE+"entrezgene"));
-        
-        model.close();
-        tdbSet.close();
+        } finally {
+            if (model != null) {
+                model.close();
+            }
+            if (tdbSet != null) {
+                tdbSet.close();
+            }
+        }
     }
+    
+    
     
 //    public File toFile(String[] path) {
 //        if (path == null || path.length == 0) {
@@ -68,5 +79,14 @@ public class TripleStoreWriterTest extends TestCase {
 //            return new File(toFile(ps),path[path.length-1]);
 //        }
 //    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        
+        if (OUT_FILE.exists()) {
+            OUT_FILE.delete();
+        }
+    }
     
 }

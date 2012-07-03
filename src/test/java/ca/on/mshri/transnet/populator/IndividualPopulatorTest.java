@@ -25,7 +25,7 @@ public class IndividualPopulatorTest extends TestCase {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         model.read(in,null);
                 
-        OntClass nsClass = model.getOntClass(TripleStoreWriter.PRE+"Namespace");
+        OntClass nsClass = model.getOntClass(TripleStoreWriter.SBNS+"Namespace");
         
         Map<Integer, Individual> map = new IndividualPopulator(model, nsClass).run("namespaces");
         

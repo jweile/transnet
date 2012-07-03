@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static ca.on.mshri.transnet.populator.TripleStoreWriter.PRE;
+import static ca.on.mshri.transnet.populator.TripleStoreWriter.SBNS;
 
 /**
  *
@@ -71,7 +71,7 @@ class IndividualPopulator {
                     continue;
                 }
                 
-                Individual ind = model.createIndividual(PRE+cols[1],clazz);
+                Individual ind = model.createIndividual(SBNS+cols[1],clazz);
                 
                 map.put(id, ind);
                 

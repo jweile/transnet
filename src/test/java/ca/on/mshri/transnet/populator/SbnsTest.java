@@ -26,6 +26,9 @@ public class SbnsTest extends TestCase {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         model.read(in,null);
         
+        OntClass c = model.getOntClass("http://llama.mshri.on.ca/sbns.owl#Object");
+        assertNotNull("Class \"Object\" not found in Ontology",c);
+        
         ExtendedIterator<OntClass> it = model.listClasses();
         while (it.hasNext()) {
             System.out.println(it.next().getURI());

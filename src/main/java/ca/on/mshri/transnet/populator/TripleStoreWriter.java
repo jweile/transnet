@@ -39,7 +39,11 @@ final class TripleStoreWriter extends EndNode<Entry> {
     private Map<Integer,Individual> id2namespaces;
     private Map<Integer,Individual> id2species;
     
-    public static final String PRE = "http://llama.mshri.on.ca/sbns.owl#";
+    public static final String SBNS = "http://llama.mshri.on.ca/sbns.owl#";
+    public static final String TRN = "urn:transnet:";
+    
+    private long lastObject = 0;
+    private long lastXref = 0;
     
     public TripleStoreWriter(File outFile) {
         super("TripleStore Writer");
@@ -57,16 +61,16 @@ final class TripleStoreWriter extends EndNode<Entry> {
         
         model.read(in,null);
                 
-        objectClass = model.getOntClass(PRE+"Object");
-        xrefClass = model.getOntClass(PRE+"XRef");
-        OntClass nsClass = model.getOntClass(PRE+"Namespace");
-        OntClass speciesClass = model.getOntClass(PRE+"Species");
+        objectClass = model.getOntClass(SBNS+"Object");
+        xrefClass = model.getOntClass(SBNS+"XRef");
+        OntClass nsClass = model.getOntClass(SBNS+"Namespace");
+        OntClass speciesClass = model.getOntClass(SBNS+"Species");
         
-        valueProp = model.getDatatypeProperty(PRE+"hasValue");
+        valueProp = model.getDatatypeProperty(SBNS+"hasValue");
         
-        nsProp = model.getObjectProperty(PRE+"hasNamespace");
-        fromSpeciesProp = model.getObjectProperty(PRE+"fromSpecies");
-        xrefProp = model.getObjectProperty(PRE+"hasXRef");
+        nsProp = model.getObjectProperty(SBNS+"hasNamespace");
+        fromSpeciesProp = model.getObjectProperty(SBNS+"fromSpecies");
+        xrefProp = model.getObjectProperty(SBNS+"hasXRef");
         
         id2namespaces = new IndividualPopulator(model, nsClass).run("namespaces");
         id2species = new IndividualPopulator(model, speciesClass).run("species");
@@ -76,14 +80,14 @@ final class TripleStoreWriter extends EndNode<Entry> {
     @Override
     public Void process(Entry in) {
         
-        Individual object = model.createIndividual(objectClass);
+        Individual object = model.createIndividual(TRN+"gene-" + ++lastObject, objectClass);
         
         Individual species = id2species.get(in.getSpeciesId());
         object.addProperty(fromSpeciesProp, species);
         
         for (Entry.Synonym syn : in.getSynonyms()) {
             
-            Individual xref = model.createIndividual(xrefClass);
+            Individual xref = model.createIndividual(TRN+"xref-"+ ++lastXref, xrefClass);
             object.addProperty(xrefProp, xref);
             xref.addLiteral(valueProp, syn.getSynonym());
             
@@ -93,8 +97,7 @@ final class TripleStoreWriter extends EndNode<Entry> {
         
         return null;
     }
-
-
+    
     
     @Override
     protected void after() {
