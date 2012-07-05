@@ -35,6 +35,7 @@ public class TDBAccess<I,O> {
     
     public TDBAccess(File dbFile, JenaModelOperation<I,O> jma) {
         this.dbFile = dbFile;
+        this.jma = jma;
     }
     
     public O perform(I in) {
