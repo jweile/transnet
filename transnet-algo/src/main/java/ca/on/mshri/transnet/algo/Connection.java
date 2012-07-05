@@ -20,7 +20,6 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -36,7 +35,7 @@ import java.util.Set;
  *
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-class Connection {
+public class Connection {
     /**
      * The predicate
      */

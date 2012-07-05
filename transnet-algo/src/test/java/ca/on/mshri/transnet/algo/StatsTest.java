@@ -16,6 +16,10 @@
  */
 package ca.on.mshri.transnet.algo;
 
+import ca.on.mshri.transnet.algo.operations.XRefRedundancyFinder;
+import ca.on.mshri.transnet.algo.operations.XRefMerger;
+import ca.on.mshri.transnet.algo.operations.XRefFrequencyAnalysis;
+import ca.on.mshri.transnet.algo.operations.XRefClusterAnalysis;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

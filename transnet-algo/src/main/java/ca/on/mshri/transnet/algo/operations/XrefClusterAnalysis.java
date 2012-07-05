@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.on.mshri.transnet.algo;
+package ca.on.mshri.transnet.algo.operations;
 
+import ca.on.mshri.transnet.algo.Sparql;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -54,7 +55,7 @@ public class XRefClusterAnalysis extends JenaModelOperation<String,String> {
         
         ObjectProperty nsProp = model.getObjectProperty(SBNS+"hasNamespace");
         
-        Logger.getLogger(Algo.class.getName())
+        Logger.getLogger(XRefClusterAnalysis.class.getName())
                             .log(Level.INFO, "Calculating XRef clustering.");
         
         //init occurrence counter map

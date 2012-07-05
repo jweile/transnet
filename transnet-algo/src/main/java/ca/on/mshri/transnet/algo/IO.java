@@ -70,7 +70,7 @@ public class IO {
             try {
                 w.close();
             } catch (IOException ex) {
-                Logger.getLogger(Algo.class.getName())
+                Logger.getLogger(IO.class.getName())
                         .log(Level.SEVERE, "Unable to close stream", ex);
             }
         }

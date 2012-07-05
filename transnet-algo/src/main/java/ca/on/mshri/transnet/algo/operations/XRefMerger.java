@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.on.mshri.transnet.algo;
+package ca.on.mshri.transnet.algo.operations;
 
+import ca.on.mshri.transnet.algo.Connection;
+import ca.on.mshri.transnet.algo.Sparql;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
@@ -106,7 +108,7 @@ public class XRefMerger extends JenaModelOperation<String, Void> {
         
         
         //##Do the actual merging##
-        Logger.getLogger(Algo.class.getName())
+        Logger.getLogger(XRefMerger.class.getName())
                             .log(Level.INFO, "Merging ..."+species);
         
         //for each set of xref objects indexed under the same keys...

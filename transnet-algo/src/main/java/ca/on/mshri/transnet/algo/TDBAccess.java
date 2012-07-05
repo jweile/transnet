@@ -16,6 +16,7 @@
  */
 package ca.on.mshri.transnet.algo;
 
+import ca.on.mshri.transnet.algo.operations.JenaModelOperation;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.tdb.TDB;

@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.on.mshri.transnet.algo;
+package ca.on.mshri.transnet.algo.operations;
 
+import ca.on.mshri.transnet.algo.Sparql;
 import cern.colt.list.IntArrayList;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
@@ -61,7 +62,7 @@ public class XRefFrequencyAnalysis extends JenaModelOperation<String,String> {
         ObjectProperty nsProp = model.getObjectProperty(SBNS+"hasNamespace");
         
         
-        Logger.getLogger(Algo.class.getName())
+        Logger.getLogger(XRefFrequencyAnalysis.class.getName())
                             .log(Level.INFO, "Calculating XRef NS frequencies.");
         
         //init global and local freqency maps
@@ -133,7 +134,7 @@ public class XRefFrequencyAnalysis extends JenaModelOperation<String,String> {
                     b.append(count).append("\t");
                 } catch (IndexOutOfBoundsException e) {
                     //if normalization didn't work
-                    Logger.getLogger(Algo.class.getName())
+                    Logger.getLogger(XRefFrequencyAnalysis.class.getName())
                             .log(Level.WARNING, "Error during result iteration.",e);
                     b.append("0\t");
                 }
