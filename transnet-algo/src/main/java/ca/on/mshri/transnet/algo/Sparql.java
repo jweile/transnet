@@ -16,9 +16,15 @@
  */
 package ca.on.mshri.transnet.algo;
 
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,8 +33,10 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -78,7 +86,6 @@ public class Sparql {
         if (src != null && src.getLocation().toString().endsWith(".jar")) {
             
             URL jarURL = src.getLocation();
-            System.err.println(jarURL);
             try {
                 ZipFile jar = new ZipFile(new File(jarURL.toURI()));
 
@@ -170,6 +177,44 @@ public class Sparql {
         } catch (QueryParseException e) {
             throw new RuntimeException("Query could not be parsed! ", e);
         }
+    }
+    
+    /**
+     * Performs a SPARQL query that returns a list of individuals.
+     * 
+     * @param query
+     * The name of the query. Corresponds to the name of the SPARQL file.
+     * 
+     * @param key 
+     * The name of the key in the query, that represents the individuals.
+     * 
+     * @param args
+     * additional <code>String</code> arguments that substitute 
+     * '<code>%s</code>' tags in the query.
+     * 
+     * @return The list of individuals.
+     */
+    public List<Individual> queryIndividuals(Model model, String query, String key, String... args) {
+        List<Individual> list = new ArrayList<Individual>();
+        
+        QueryExecution qexec = QueryExecutionFactory
+                .create(get(query, args), model);
+        
+        try {
+            ResultSet r = qexec.execSelect();
+            while (r.hasNext()) {
+                QuerySolution sol = r.next();
+                
+                Individual i = sol.getResource(key)
+                        .as(Individual.class);
+                
+                list.add(i);
+            }
+        } finally {
+            qexec.close();
+        }
+        
+        return list;
     }
     
     

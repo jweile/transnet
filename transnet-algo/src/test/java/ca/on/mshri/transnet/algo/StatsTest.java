@@ -27,56 +27,72 @@ import junit.framework.TestCase;
  *
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class AlgoTest extends TestCase {
+public class StatsTest extends TestCase {
     
     public static final String PRE = "http://llama.mshri.on.ca/sbns.owl#";
     public static final String TRN = "urn:transnet:";
+    public static final String YEAST = "Saccharomyces_cerevisiae";
     
-    public void testStats() throws Exception {
+    private OntModel model;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         
         InputStream in = new FileInputStream("src/test/resources/sbns.owl");
-        OntModel model = null;
-        try {
-            model = ModelFactory.createOntologyModel();
-            model.read(in,null);
-            
-            addTestData(model);
+        
+        model = ModelFactory.createOntologyModel();
+        model.read(in,null);
 
-            Algo algo = new Algo(model);
-            String out = algo.analyzeXRefFrequencies("Saccharomyces_cerevisiae");
-            
-            System.out.println(out);
-            
-        } finally {
-            model.close();
-        }
+        addTestData(model);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        model.close();
+    }
+    
+    
+    
+    public void testXRefFrequencyAnalysis() throws Exception {
+        
+        String out = new XRefFrequencyAnalysis().operation(model, YEAST);
+        
+        System.out.println(out);
         
     }
     
-    public void testClusters() throws Exception {
+    public void testXRefClusterAnalysis() throws Exception {
         
-        InputStream in = new FileInputStream("src/test/resources/sbns.owl");
-        OntModel model = null;
-        try {
-            model = ModelFactory.createOntologyModel();
-            model.read(in,null);
-            
-            addTestData(model);
-
-            Algo algo = new Algo(model);
-            String out = algo.analyzeXRefClusters("Saccharomyces_cerevisiae");
-            
-            System.out.println(out);
-            
-        } finally {
-            model.close();
-        }
+        String out = new XRefClusterAnalysis().operation(model, YEAST);
+        
+        System.out.println(out);
+        
+    }
+    
+    public void testXRefRedundancyFinder() throws Exception {
+        
+        String out = new XRefRedundancyFinder().operation(model, YEAST);
+        
+        System.out.println(out);
+        
+    }
+    
+    public void testXRefMerger() throws Exception {
+        
+        new XRefMerger().operation(model, YEAST);
+        
+        String out = new XRefRedundancyFinder().operation(model, YEAST);
+        
+        System.out.println("Redundancies after merging:");
+        System.out.println(out);
         
     }
 
     private void addTestData(OntModel model) {
         
-        Individual yeast = model.createIndividual(PRE+"Saccharomyces_cerevisiae", 
+        Individual yeast = model.createIndividual(PRE+YEAST, 
                 model.getOntClass(PRE+"Species"));
         Individual sgd = model.createIndividual(PRE+"SGD", 
                 model.getOntClass(PRE+"Namespace"));
@@ -90,6 +106,10 @@ public class AlgoTest extends TestCase {
         addXRef(model, TRN+"xref2", gene, sgd, "YML123C");
         addXRef(model, TRN+"xref3", gene, sgd, "YUB024W");
         addXRef(model, TRN+"xref4", gene, entrez, "12345");
+        
+        //add gene with redundant xref
+        gene = addGene(model, TRN+"gene3", yeast);
+        addXRef(model, TRN+"xref5", gene, sgd, "YML123C");
         
     }
     

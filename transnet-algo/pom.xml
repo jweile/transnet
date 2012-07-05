@@ -9,6 +9,12 @@
     <packaging>jar</packaging>
 
     <name>transnet-algo</name>
+    
+    <parent>
+        <groupId>ca.on.mshri</groupId>
+        <artifactId>transnet-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
 
     <build>
         

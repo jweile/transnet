@@ -17,6 +17,7 @@
 package ca.on.mshri.transnet.algo;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
 import java.io.File;
 import java.io.IOException;
@@ -134,31 +135,56 @@ public class Main {
         
         IO io = IO.getInstance();
         
-        //try to connect to database
-        Dataset tdbSet = null;
-        try {
-            
-            tdbSet = TDBFactory.createDataset(dbFile.getAbsolutePath());
-            //create algo object
-            Algo algo = new Algo(tdbSet.getDefaultModel());
-            
-            //analyze xref frequencies
-            String out = algo.analyzeXRefFrequencies(species);
-            io.write("xref_freqs.csv", out);
-            
-            //analyze xref clustering
-            out = algo.analyzeXRefClusters(species);
-            io.write("xref_clusters.csv",out);
-            
-            //find xref redundancies.
-            out = algo.findXRefRedundancies(species);
-            io.write("xref_ambiguous.txt", out);
-            
-        } finally {
-            if (tdbSet == null) {
-                tdbSet.close();
-            }
-        }
+        String out;
+        
+        out = new TDBAccess<String,String>(dbFile, new XRefFrequencyAnalysis())
+                .perform(species);
+        io.write("xref_freqs.csv", out);
+        
+        out = new TDBAccess<String,String>(dbFile, new XRefClusterAnalysis())
+                .perform(species);
+        io.write("xref_freqs.csv", out);
+        
+        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
+                .perform(species);
+        io.write("xref_freqs.csv", out);
+        
+        new TDBAccess<String,Void>(dbFile, new XRefMerger())
+                .perform(species);
+        
+//        //try to connect to database
+//        Dataset tdbSet = null;
+//        try {
+//            
+//            tdbSet = TDBFactory.createDataset(dbFile.getAbsolutePath());
+//            //create algo object
+//            Algo algo = new Algo(tdbSet.getDefaultModel());
+//            
+////            //analyze xref frequencies
+////            String out = algo.analyzeXRefFrequencies(species);
+////            io.write("xref_freqs.csv", out);
+////            
+////            //analyze xref clustering
+////            out = algo.analyzeXRefClusters(species);
+////            io.write("xref_clusters.csv",out);
+//            
+//            //find xref redundancies.
+//            String out = algo.findXRefRedundancies(species);
+//            io.write("xref_ambiguous.txt", out);
+//            
+//            //merge ambiguous xrefs.
+//            algo.mergeAmbiguousXRefs();
+//            
+//            //control check, finding leftover redundancies
+//            out = algo.findXRefRedundancies(species);
+//            io.write("xref_ambiguous_after.txt", out);
+//            
+//        } finally {
+//            if (tdbSet == null) {
+//                tdbSet.close();
+//                TDB.closedown();
+//            }
+//        }
         
     }
 }

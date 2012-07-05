@@ -325,6 +325,8 @@ class Algo {
             //perform the merging of xrefs
             mergeAmbiguousXRefsOfSpecies(species);
         }
+        
+        model.commit();
 
     }
 
@@ -334,7 +336,7 @@ class Algo {
      * The species to work with. Corresponds to the URI suffix for 
      * the species in the ontology (e.g. <code>Saccharomyces_cerevisiae</code>)
      */
-    public void mergeAmbiguousXRefsOfSpecies(Individual species) {
+    private void mergeAmbiguousXRefsOfSpecies(Individual species) {
 
         //##Indexing##
         Logger.getLogger(Algo.class.getName())
@@ -568,89 +570,6 @@ class Algo {
             b.append(s.toString());
         }
         return b.toString();
-    }
-    
-    /**
-     * a class representing a connection to an adjacent node in an RDF graph.
-     */
-    private static class Connection {
-        
-        /**
-         * The predicate
-         */
-        private Property predicate;
-        
-        /**
-         * The actual neighbouring node
-         */
-        private RDFNode neighbour;
-        
-        /**
-         * Whether the connection is outgoing or incoming.
-         */
-        private boolean outgoing;
-
-        /**
-         * Convenience constructor.
-         */
-        public Connection(Property predicate, RDFNode neighbour, boolean outgoing) {
-            this.predicate = predicate;
-            this.neighbour = neighbour;
-            this.outgoing = outgoing;
-        }
-
-        /**
-         * @return the neighbouring node.
-         */
-        public RDFNode getNeighbour() {
-            return neighbour;
-        }
-
-        /**
-         * @return whether the connection is outgoing or incoming
-         */
-        public boolean isOutgoing() {
-            return outgoing;
-        }
-
-        /**
-         * @return the predicate of the connection.
-         */
-        public Property getPredicate() {
-            return predicate;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Connection other = (Connection) obj;
-            if (this.predicate != other.predicate && (this.predicate == null || !this.predicate.equals(other.predicate))) {
-                return false;
-            }
-            if (this.neighbour != other.neighbour && (this.neighbour == null || !this.neighbour.equals(other.neighbour))) {
-                return false;
-            }
-            if (this.outgoing != other.outgoing) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            hash = 29 * hash + (this.predicate != null ? this.predicate.hashCode() : 0);
-            hash = 29 * hash + (this.neighbour != null ? this.neighbour.hashCode() : 0);
-            hash = 29 * hash + (this.outgoing ? 1 : 0);
-            return hash;
-        }
-        
-        
     }
     
     /**
