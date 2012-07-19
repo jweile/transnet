@@ -16,7 +16,16 @@
  */
 package ca.on.mshri.transnet.algo;
 
+import ca.on.mshri.transnet.algo.operations.XRefMerger;
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import de.jweile.yogiutil.Pair;
+import java.util.HashSet;
+import java.util.Set;
 import junit.framework.TestCase;
 
 /**
@@ -58,6 +67,33 @@ public class SparqlTest extends TestCase {
         
         System.out.println(q.toString());
                 
+    }
+    
+    public void testGetAllConnectedGenes() throws Exception {
+        
+        Query q = Sparql.getInstance().get("getAllConnectedGenes", 
+                OntTestData.SBNS+OntTestData.YEAST);
+        assertNotNull("Query did not load!", q);
+        
+        OntTestData testData = new OntTestData();
+        OntModel model = testData.setUpTestModel();
+        new XRefMerger().operation(model, OntTestData.YEAST);
+        
+        
+        Set<Pair<Individual>> pairs = new HashSet<Pair<Individual>>();
+        
+        ResultSet r = QueryExecutionFactory.create(q,model).execSelect();
+        while (r.hasNext()) {
+            QuerySolution s = r.next();
+            pairs.add(new Pair<Individual>(
+                    s.getResource("gene1").as(Individual.class), 
+                    s.getResource("gene2").as(Individual.class)));
+        }
+        
+        assertFalse("No results returned!",pairs.isEmpty());
+        
+        System.out.println(pairs.toString());
+        
     }
     
 }

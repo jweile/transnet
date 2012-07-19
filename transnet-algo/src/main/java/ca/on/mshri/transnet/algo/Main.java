@@ -16,6 +16,7 @@
  */
 package ca.on.mshri.transnet.algo;
 
+import ca.on.mshri.transnet.algo.operations.GeneJaccardAnalysis;
 import ca.on.mshri.transnet.algo.operations.XRefFrequencyAnalysis;
 import ca.on.mshri.transnet.algo.operations.XRefClusterAnalysis;
 import ca.on.mshri.transnet.algo.operations.XRefRedundancyFinder;
@@ -146,16 +147,20 @@ public class Main {
 //                .perform(species);
 //        io.write("xref_clusters.csv", out);
         
-        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
-                .perform(species);
-        io.write("xref_redundancies.csv", out);
+//        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
+//                .perform(species);
+//        io.write("xref_redundancies.csv", out);
+//        
+//        new TDBAccess<String,Void>(dbFile, new XRefMerger())
+//                .perform(species);
+//        
+//        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
+//                .perform(species);
+//        io.write("xref_redundancies_after.csv", out);
         
-        new TDBAccess<String,Void>(dbFile, new XRefMerger())
+        out = new TDBAccess<String,String>(dbFile, new GeneJaccardAnalysis())
                 .perform(species);
-        
-        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
-                .perform(species);
-        io.write("xref_redundancies_after.csv", out);
+        io.write("genepair_jaccard.csv", out);
         
     }
 }

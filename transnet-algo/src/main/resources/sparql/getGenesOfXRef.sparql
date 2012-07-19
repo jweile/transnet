@@ -1,0 +1,7 @@
+PREFIX sbns: <http://llama.mshri.on.ca/sbns.owl#>
+
+SELECT ?gene
+WHERE
+{
+	?gene sbns:hasXRef <%s> .
+}

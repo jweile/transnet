@@ -1,0 +1,11 @@
+PREFIX : <http://llama.mshri.on.ca/sbns.owl#>
+
+#Find all pairs of genes from species s that share an xref
+
+SELECT ?gene1 ?gene2
+WHERE
+{
+    ?gene1 :hasXRef/^:hasXRef ?gene2 .
+    ?gene1 :fromSpecies <%s> .
+    FILTER (?gene1 != ?gene2)
+}
