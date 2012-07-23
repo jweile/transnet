@@ -25,6 +25,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import de.jweile.yogiutil.Pair;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import junit.framework.TestCase;
 
@@ -93,6 +94,33 @@ public class SparqlTest extends TestCase {
         assertFalse("No results returned!",pairs.isEmpty());
         
         System.out.println(pairs.toString());
+        
+    }
+    
+    public void testGetCommonNs() throws Exception {
+        
+        OntTestData testData = new OntTestData();
+        OntModel model = testData.setUpTestModel();
+        new XRefMerger().operation(model, OntTestData.YEAST);
+        
+        
+        Query q = Sparql.getInstance().get("getCommonNsOfPair", 
+                OntTestData.TRN+"gene2", OntTestData.TRN+"gene3");
+        assertNotNull("Query did not load!", q);
+        
+        ResultSet r = QueryExecutionFactory.create(q, model).execSelect();
+        
+        int count = 0;
+        while (r.hasNext()) {
+            QuerySolution s = r.next();
+            Individual ns = s.getResource("ns").as(Individual.class);
+            int numref = s.getLiteral("numref").getInt();
+            System.out.println(ns+"\t"+numref);
+//            System.out.println(numref);
+            count++;
+        }
+        
+        assertTrue("No results",count > 0);
         
     }
     

@@ -16,11 +16,7 @@
  */
 package ca.on.mshri.transnet.algo;
 
-import ca.on.mshri.transnet.algo.operations.GeneJaccardAnalysis;
-import ca.on.mshri.transnet.algo.operations.XRefFrequencyAnalysis;
-import ca.on.mshri.transnet.algo.operations.XRefClusterAnalysis;
-import ca.on.mshri.transnet.algo.operations.XRefRedundancyFinder;
-import ca.on.mshri.transnet.algo.operations.XRefMerger;
+import ca.on.mshri.transnet.algo.operations.NamespaceCoherenceAnalysis;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -158,9 +154,13 @@ public class Main {
 //                .perform(species);
 //        io.write("xref_redundancies_after.csv", out);
         
-        out = new TDBAccess<String,String>(dbFile, new GeneJaccardAnalysis())
+//        out = new TDBAccess<String,String>(dbFile, new GeneJaccardAnalysis())
+//                .perform(species);
+//        io.write("genepair_jaccard.csv", out);
+        
+        out = new TDBAccess<String, String>(dbFile, new NamespaceCoherenceAnalysis())
                 .perform(species);
-        io.write("genepair_jaccard.csv", out);
+        io.write("ns_coherence.csv", out);
         
     }
 }

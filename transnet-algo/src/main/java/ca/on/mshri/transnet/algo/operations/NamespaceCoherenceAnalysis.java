@@ -17,7 +17,6 @@
 package ca.on.mshri.transnet.algo.operations;
 
 import ca.on.mshri.transnet.algo.Sparql;
-import com.hp.hpl.jena.ontology.ConversionException;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -28,66 +27,98 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import de.jweile.yogiutil.CliProgressBar;
+import de.jweile.yogiutil.IntArrayList;
+import de.jweile.yogiutil.LazyInitMap;
 import de.jweile.yogiutil.SetOfTwo;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Calculate Jaccard coefficient for all gene pairs.
+ *
+ * Infer a coherence score for each namespace based on how many xref-links agree
+ * for this each namespace.
  * 
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class GeneJaccardAnalysis extends JenaModelOperation<String, String> {
-
+public class NamespaceCoherenceAnalysis extends JenaModelOperation<String, String> {
+    
     @Override
     public String operation(Model tdbModel, String species) {
         
-        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbModel);
+        OntModel model = ModelFactory
+                .createOntologyModel(OntModelSpec.OWL_DL_MEM, tdbModel);
         
         Sparql sparql = Sparql.getInstance();
         
         Logger.getLogger(XRefClusterAnalysis.class.getName())
                             .log(Level.INFO, "Searching for connected genes...");
-        
-        StringBuilder b = new StringBuilder("Jaccard\tIntersection\n");
-        
-        Set<SetOfTwo<Individual>> allConnectedPairs = getAllConnectedPairs(model, species);
+                
+        Set<SetOfTwo<Individual>> pairs = getAllConnectedPairs(model, species);
         
         Logger.getLogger(XRefClusterAnalysis.class.getName())
-                            .log(Level.INFO, "Found "+allConnectedPairs.size()+
+                            .log(Level.INFO, "Found "+pairs.size()+
                             " connected gene pairs.");
         
-        CliProgressBar pb = new CliProgressBar(allConnectedPairs.size());
+        CliProgressBar pb = new CliProgressBar(pairs.size());
         
-        for (SetOfTwo<Individual> pair : allConnectedPairs) {
+        LazyInitMap<Individual,IntArrayList> index = 
+                new LazyInitMap<Individual, IntArrayList>(IntArrayList.class);
+        
+        for (SetOfTwo<Individual> pair : pairs) {
             
-            List<Individual> xrefs1 = sparql
-                    .queryIndividuals(model, "getXRefsOfGene", "xref", pair.getA().getURI());
-            List<Individual> xrefs2 = sparql
-                    .queryIndividuals(model, "getXRefsOfGene", "xref", pair.getB().getURI());
+            Map<Individual, Integer> scores = getNamespaceScores(pair.getA(), pair.getB(), model);
             
-            Set<Individual> union = new HashSet<Individual>();
-            union.addAll(xrefs1);
-            union.addAll(xrefs2);
-            
-            Set<Individual> intersection = new HashSet<Individual>();
-            intersection.addAll(xrefs1);
-            intersection.retainAll(xrefs2);
-            
-            double jaccard = (double)intersection.size() / (double)union.size();
-            
-            b.append(jaccard)
-                .append("\t")
-                .append(intersection.size())
-                .append("\n");
-            
+            int sum = 0;
+            for (int score : scores.values()) {
+                sum += score;
+            }
+            for (Individual ns : scores.keySet()) {
+                index.getOrCreate(ns).add(sum-scores.get(ns));
+            }
+                        
             pb.next();
         }
         
+        //OUTPUT
+        
+        //deterimine longest namespace list
+        int maxlen = Integer.MIN_VALUE;
+        for (List<Integer> l : index.values()) {
+            maxlen = l.size() > maxlen ? l.size() : maxlen;
+        }
+        
+        StringBuilder b = new StringBuilder();
+        
+        //header
+        List<Individual> keys = new ArrayList<Individual>(index.keySet());
+        for (Individual ns : keys) {
+            b.append(ns).append("\t");
+        }
+        if (b.length() > 0) {
+            b.deleteCharAt(b.length() -1);
+            b.append("\n");
+        }
+        
+        for (int i = 0; i < maxlen; i++) {
+            
+            for (Individual key : keys) {
+                List<Integer> list = index.get(key);
+                if (list.size() > i) {
+                    b.append(list.get(i));
+                } 
+                b.append("\t");
+            }
+            b.deleteCharAt(b.length() -1);
+            b.append("\n");
+            
+        }
         
         return b.toString();
     }
@@ -143,6 +174,34 @@ public class GeneJaccardAnalysis extends JenaModelOperation<String, String> {
         
         
         return list;
+    }
+
+    private Map<Individual,Integer> getNamespaceScores(Individual a, Individual b, OntModel model) {
+        
+        Map<Individual,Integer> counts = new HashMap<Individual, Integer>();
+        
+        Sparql sparql = Sparql.getInstance();
+        
+        ResultSet r = QueryExecutionFactory.create(
+            sparql.get("getCommonNsOfPair",
+                a.getURI(), 
+                b.getURI()
+            ),
+            model
+        ).execSelect();
+
+        while (r.hasNext()) {
+
+            QuerySolution s = r.next();
+
+            int numref = s.getLiteral("numref").getInt();
+            Individual ns = s.getResource("ns").as(Individual.class);
+
+            counts.put(ns,numref);
+
+        }
+        
+        return counts;
     }
     
 }

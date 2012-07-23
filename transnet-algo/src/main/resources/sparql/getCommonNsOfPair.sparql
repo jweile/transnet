@@ -1,0 +1,11 @@
+PREFIX : <http://llama.mshri.on.ca/sbns.owl#>
+
+#get namespaces of xrefs that gene1 and gene2 have in common.
+
+SELECT ?ns (COUNT(?xref) AS ?numref)
+WHERE
+{
+        ?xref ^:hasXRef <%s>, <%s> .
+        ?xref :hasNamespace ?ns .
+}
+GROUP BY ?ns

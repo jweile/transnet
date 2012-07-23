@@ -5,7 +5,7 @@ PREFIX : <http://llama.mshri.on.ca/sbns.owl#>
 SELECT ?gene1 ?gene2
 WHERE
 {
-    ?gene1 :hasXRef/^:hasXRef ?gene2 .
     ?gene1 :fromSpecies <%s> .
+    ?gene1 :hasXRef/^:hasXRef ?gene2 .
     FILTER (?gene1 != ?gene2)
 }

@@ -17,7 +17,6 @@
 package ca.on.mshri.transnet.algo.operations;
 
 import ca.on.mshri.transnet.algo.Sparql;
-import cern.colt.list.IntArrayList;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
@@ -27,8 +26,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import de.jweile.yogiutil.CliProgressBar;
 import de.jweile.yogiutil.Counts;
+import de.jweile.yogiutil.IntArrayList;
 import de.jweile.yogiutil.LazyInitMap;
-import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
