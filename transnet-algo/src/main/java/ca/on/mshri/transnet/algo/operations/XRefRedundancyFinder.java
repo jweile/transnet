@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class XRefRedundancyFinder extends JenaModelOperation<String,String> {
+public class XRefRedundancyFinder implements JenaModelOperation<String,String> {
     
     
     /**

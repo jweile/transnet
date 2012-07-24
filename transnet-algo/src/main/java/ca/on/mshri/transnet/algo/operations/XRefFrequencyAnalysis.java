@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * 
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class XRefFrequencyAnalysis extends JenaModelOperation<String,String> {
+public class XRefFrequencyAnalysis implements JenaModelOperation<String,String> {
   
     
     /**
@@ -125,7 +125,9 @@ public class XRefFrequencyAnalysis extends JenaModelOperation<String,String> {
         for (String key : countLists.keySet()) {
             b.append(key).append("\t");
         }
-        b.deleteCharAt(b.length()-1).append("\n");
+        if (b.length() > 0){
+            b.deleteCharAt(b.length()-1).append("\n");
+        }
         for (int i = 0; i < maxlen; i++) {
             for (String key : countLists.keySet()) {
                 try {
@@ -138,7 +140,9 @@ public class XRefFrequencyAnalysis extends JenaModelOperation<String,String> {
                     b.append("0\t");
                 }
             }
-            b.deleteCharAt(b.length()-1).append("\n");
+            if (b.length() > 0) {
+                b.deleteCharAt(b.length()-1).append("\n");
+            }
         }
         
         return b.toString();

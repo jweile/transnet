@@ -16,7 +16,7 @@
  */
 package ca.on.mshri.transnet.algo;
 
-import ca.on.mshri.transnet.algo.operations.NamespaceCoherenceAnalysis;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -42,16 +42,17 @@ public class Main {
     public static void main(String[] args) {
         try {
             
-            if(args.length < 2) {
+            if(args.length == 0) {
                 usageAndDie();
             }
             
             setupLogging();
             
-            new Main().run(args[0], args[1]);
+            new Main().run(args);
             
         } catch (Throwable t) {
             processError(t);
+            System.exit(1);
         }
     }
 
@@ -63,14 +64,16 @@ public class Main {
         
         StringBuilder b = new StringBuilder(256);
 
-        b.append(t.getMessage());
+        b.append(t.getMessage() != null ? t.getMessage() : "An error ocurred!");
         Throwable cause = t;
         while ((cause = cause.getCause()) != null) {
-            b.append("\nReason: ").append(cause.getMessage());
+            b.append("\nReason: ").append(cause.getMessage() != null ? cause.getMessage() : "An error ocurred!");
         }
 
         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, b.toString(), t);
+        System.err.println("See log file for details.");
     }
+    
 
     /**
      * Enables simple command line output for and extensive logging to file.
@@ -116,14 +119,16 @@ public class Main {
      * print usage and exit
      */
     private static void usageAndDie() {
-        System.err.println("Usage: java -jar transnet-algo.jar <dbFile> <species>");
+        System.err.println("Usage: java -jar transnet-algo.jar <dbFile> {<command>}");
         System.exit(1);
     }
 
     /**
      * run the main program.
      */
-    private void run(String dbPos, String species) {
+    private void run(String args[]) {
+        
+        String dbPos = args[0];
         
         //check database
         File dbFile = new File(dbPos);
@@ -131,36 +136,62 @@ public class Main {
             throw new RuntimeException("DB directory does not exist or cannot be read!");
         }
         
+        greet();
+        
         IO io = IO.getInstance();
         
-        String out;
+        if (args.length > 1) {
+            
+            //execute command directly
+            String cmd = args[1];
+            try {
+                String out = OperationsRegistry.getInstance().executeCommand(dbFile, cmd);
+                io.write("out.csv", out);
+                Logger.getLogger(Main.class.getName())
+                        .log(Level.INFO, "Results written to out.csv");
+            } catch (Exception e) {
+                throw new RuntimeException("An error occurred executing your command", e);
+            }
+            
+        } else {
+            
+            //interactive mode
+            Console cons = System.console();
+            if (cons == null) {
+                throw new RuntimeException("Unable to access console!");
+            }
+
+            String outFile = "out.csv";
+            boolean exit = false;
+            while(!exit) {
+                String cmd = cons.readLine("> ");
+                if (cmd.equalsIgnoreCase("exit")) {
+                    exit = true;
+                } else if (cmd.equalsIgnoreCase("quit")) {
+                    exit = true;
+                } else if (cmd.startsWith("out=")) {
+                    outFile = cmd.split("=")[1];
+                } else if (cmd.equalsIgnoreCase("help")) {
+                    System.out.println("Available commands:");
+                    System.out.println(OperationsRegistry.getInstance().list());
+                } else {
+                    try {
+                        String out = OperationsRegistry.getInstance().executeCommand(dbFile, cmd);
+                        io.write(outFile, out);
+                        Logger.getLogger(Main.class.getName())
+                                .log(Level.INFO, "Results written to "+outFile);
+                    } catch (Exception ex) {
+                        processError(ex);
+                    }
+                }
+            }
         
-//        out = new TDBAccess<String,String>(dbFile, new XRefFrequencyAnalysis())
-//                .perform(species);
-//        io.write("xref_freqs.csv", out);
-//        
-//        out = new TDBAccess<String,String>(dbFile, new XRefClusterAnalysis())
-//                .perform(species);
-//        io.write("xref_clusters.csv", out);
+        }
         
-//        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
-//                .perform(species);
-//        io.write("xref_redundancies.csv", out);
-//        
-//        new TDBAccess<String,Void>(dbFile, new XRefMerger())
-//                .perform(species);
-//        
-//        out = new TDBAccess<String,String>(dbFile, new XRefRedundancyFinder())
-//                .perform(species);
-//        io.write("xref_redundancies_after.csv", out);
-        
-//        out = new TDBAccess<String,String>(dbFile, new GeneJaccardAnalysis())
-//                .perform(species);
-//        io.write("genepair_jaccard.csv", out);
-        
-        out = new TDBAccess<String, String>(dbFile, new NamespaceCoherenceAnalysis())
-                .perform(species);
-        io.write("ns_coherence.csv", out);
-        
+    }
+
+    private void greet() {
+        System.out.println("\n\nTransnet Algorithms v0.1 -- Copyright Roth Lab 2012 LGPL");
+        System.out.println("Send bug reports to Jochen Weile <jochenweile@gmail.com>");
     }
 }

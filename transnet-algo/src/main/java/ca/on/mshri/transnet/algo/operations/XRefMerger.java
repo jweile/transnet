@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * 
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class XRefMerger extends JenaModelOperation<String, Void> {
+public class XRefMerger implements JenaModelOperation<String, Void> {
 
 
     

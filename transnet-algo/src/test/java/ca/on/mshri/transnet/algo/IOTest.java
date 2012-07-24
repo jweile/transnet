@@ -31,7 +31,7 @@ public class IOTest extends TestCase {
         File f = new File("target/iotest.txt");
         String contents = "These are some\n test contents.";
         
-        IO.getInstance().write(f.getAbsolutePath(), contents);
+        IO.getInstance().write(f, contents);
         
         assertTrue(f.exists());
         

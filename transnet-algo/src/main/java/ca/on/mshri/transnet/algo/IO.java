@@ -17,10 +17,14 @@
 package ca.on.mshri.transnet.algo;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +38,11 @@ public class IO {
      * singleton instance
      */
     private static IO instance;
+    
+    /**
+     * output directory
+     */
+    private File outputDir;
     
     /**
      * singleton constructor
@@ -56,13 +65,13 @@ public class IO {
     
     /**
      * writes a string to a file.
-     * @param filename the file name
+     * @param file the file
      * @param contents the contents to be written.
      */
-    public void write(String filename, String contents) {
+    public void write(File file, String contents) {
         BufferedWriter w = null;
         try {
-            w = new BufferedWriter(new FileWriter(filename));
+            w = new BufferedWriter(new FileWriter(file));
             w.write(contents);
         } catch (IOException e) {
             throw new RuntimeException("Unable to write output file!", e);
@@ -74,6 +83,15 @@ public class IO {
                         .log(Level.SEVERE, "Unable to close stream", ex);
             }
         }
+    }
+    
+    /**
+     * writes a string to a file in the predefined output directory.
+     * @param filename the file
+     * @param contents the contents to be written.
+     */
+    public void write(String filename, String contents) {
+        write(new File(getOutputDir(),filename),contents);
     }
     
     /**
@@ -111,5 +129,28 @@ public class IO {
             }
         }
     }
+    
+    private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+    
+    public File getOutputDir() {
+        if (outputDir == null) {
+            outputDir = new File(new File("output"),format.format(new Date()));
+            outputDir.mkdirs();
+        }
+        return outputDir;
+    }
+    
+    public void deleteRecursively(File dir) {
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                deleteRecursively(file);
+            } else {
+                file.delete();
+            }
+        }
+        dir.delete();
+    }
+    
+    
     
 }

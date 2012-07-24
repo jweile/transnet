@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * 
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class NamespaceCoherenceAnalysis extends JenaModelOperation<String, String> {
+public class NamespaceCoherenceAnalysis implements JenaModelOperation<String, String> {
     
     @Override
     public String operation(Model tdbModel, String species) {

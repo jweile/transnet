@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * 
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class GeneJaccardAnalysis extends JenaModelOperation<String, String> {
+public class GeneJaccardAnalysis implements JenaModelOperation<String, String> {
 
     @Override
     public String operation(Model tdbModel, String species) {

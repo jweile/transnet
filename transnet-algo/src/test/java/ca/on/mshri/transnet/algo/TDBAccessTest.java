@@ -32,9 +32,9 @@ public class TDBAccessTest extends TestCase {
     
     public static final String PRE = "urn:test:";
     
+    private File dbDir = new File("target/tdb_test");
+ 
     public void testWrite() {
-        
-        File dbfile = new File("target/tdb_test");
         
         JenaModelOperation<Void,Void> jmo = new JenaModelOperation<Void,Void>() {
 
@@ -51,14 +51,14 @@ public class TDBAccessTest extends TestCase {
             }
         };
         
-        TDBAccess<Void,Void> tdba = new TDBAccess<Void, Void>(dbfile, jmo);
+        TDBAccess<Void,Void> tdba = new TDBAccess<Void, Void>(dbDir, jmo);
         tdba.perform(null);
         
     }
     
     public void testRead() {
         
-        File dbfile = new File("target/tdb_test");
+        testWrite();
         
         JenaModelOperation<Void,String> jmo = new JenaModelOperation<Void,String>() {
 
@@ -76,10 +76,18 @@ public class TDBAccessTest extends TestCase {
             }
         };
         
-        TDBAccess<Void,String> tdba = new TDBAccess<Void, String>(dbfile, jmo);
+        TDBAccess<Void,String> tdba = new TDBAccess<Void, String>(dbDir, jmo);
         String out = tdba.perform(null);
         
         System.out.println(out);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if (dbDir.exists()) {
+            IO.getInstance().deleteRecursively(dbDir);
+        }
     }
     
     

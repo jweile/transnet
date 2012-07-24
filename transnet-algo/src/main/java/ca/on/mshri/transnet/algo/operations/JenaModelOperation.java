@@ -22,7 +22,7 @@ import com.hp.hpl.jena.rdf.model.Model;
  *
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public abstract class JenaModelOperation<I,O> {
+public interface JenaModelOperation<I,O> {
     
     
     /**

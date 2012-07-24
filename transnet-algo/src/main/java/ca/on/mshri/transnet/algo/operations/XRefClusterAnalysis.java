@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author Jochen Weile <jochenweile@gmail.com>
  */
-public class XRefClusterAnalysis extends JenaModelOperation<String,String> {
+public class XRefClusterAnalysis implements JenaModelOperation<String,String> {
    
     
     /**
